@@ -1,3 +1,6 @@
+#### Start server:
+`$ nodemon server/server.js`
+
 #### Run tests:
-`$ nodemon --exec 'npm test' `
+`$ npm run test-watch`
 

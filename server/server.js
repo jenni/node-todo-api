@@ -50,6 +50,21 @@ app.get('/todos/:id', async (req, res) => {
   }
 })
 
+app.delete('/todos/:id', async (req, res) => {
+  const id = req.params.id
+
+  try {
+    const todo = await Todo.findByIdAndRemove(id)
+
+    if (!todo) {
+      return res.status(400).send('resource not found')
+    }
+
+    res.status(200).send({ todo })
+  } catch(e) {
+    res.status(400).send('something went wrong')
+  }
+})
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}...`)

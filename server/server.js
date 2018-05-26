@@ -105,7 +105,7 @@ app.patch('/todos/:id', async (req, res) => {
 
 app.post('/users', async (req, res) => {
   const body = _.pick(req.body, ['email', 'password'])
-  const user = new User({ body })
+  const user = new User(body)
 
   try {
     const userRecord = await user.save()

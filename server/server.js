@@ -14,6 +14,8 @@ const port = process.env.PORT
 
 app.use(bodyParser.json())
 
+app.get('/', async (req, res) => res.send('lalalala'))
+
 app.post('/todos', async (req, res) => {
   const todo = new Todo({
     text: req.body.text
@@ -85,13 +87,11 @@ app.patch('/todos/:id', async (req, res) => {
       body.completedAt = null
     }
 
-
     const todo = await Todo.findByIdAndUpdate(
                             id,
                             { $set: body },
                             { new: true }
                           )
-
     
     if (!todo) {
       return res.status(404).send()
@@ -100,8 +100,19 @@ app.patch('/todos/:id', async (req, res) => {
     res.send({ todo })
   } catch(e) {
     res.status(404).send('something went wrong')
+  }       
+})
+
+app.post('/users', async (req, res) => {
+  const body = _.pick(req.body, ['email', 'password'])
+  const user = new User({ body })
+
+  try {
+    const userRecord = await user.save()
+    res.status(200).send(userRecord)
+  } catch(e) {
+    res.status(400).send(e)
   }
-              
 })
 
 app.listen(port, () => {

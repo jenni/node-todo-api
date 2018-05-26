@@ -103,16 +103,17 @@ app.patch('/todos/:id', async (req, res) => {
   }       
 })
 
-app.post('/users', async (req, res) => {
+app.post('/users', (req, res) => {
   const body = _.pick(req.body, ['email', 'password'])
   const user = new User(body)
 
-  try {
-    const userRecord = await user.save()
-    res.status(200).send(userRecord)
-  } catch(e) {
+  user.save().then(() => {
+    return user.generateAuthToken()
+  }).then((token) => {
+    res.header('x-auth', token).send(user)
+  }).catch((e) => {
     res.status(400).send(e)
-  }
+  })
 })
 
 app.listen(port, () => {

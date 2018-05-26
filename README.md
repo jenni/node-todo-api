@@ -14,7 +14,14 @@ https://another-nodejs-todo-api.herokuapp.com/todos
 
 _________________
 
-#### Set process.env.NODE_ENV locally
+#### DB's
 
+There is a DB for each environment (production, development and testing):
 
-
+**package.json**
+```
+...
+"start": "node server/server.js"
+"test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha server/**/*.test.js",
+...
+```

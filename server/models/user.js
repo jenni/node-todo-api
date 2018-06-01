@@ -59,7 +59,6 @@ UserSchema.methods.generateAuthToken = function() {
   })
 }
 
-
 // .statics : model method
 UserSchema.statics.findByToken = function(token) {
   const User = this

@@ -101,7 +101,7 @@ app.patch('/todos/:id', async (req, res) => {
     res.send({ todo })
   } catch(e) {
     res.status(404).send('something went wrong')
-  }       
+  }
 })
 
 app.post('/users', (req, res) => {
@@ -120,6 +120,21 @@ app.post('/users', (req, res) => {
 // this route requires authentication
 app.get('/users/me', authenticate, async (req, res) => {
   res.send(req.user)
+})
+
+// POST /users/login {email, password}
+
+app.post('/users/login', async (req, res) => {
+  const body = _.pick(req.body, ['email', 'password'])
+
+  try {
+    const user = await User.findByCredentials(body.email, body.password)  // find user in mongo that has same email
+    const token = await user.generateAuthToken()
+
+    res.header('x-auth', token).send(user) // set the header
+  } catch(e) {
+    res.send(400)
+  }
 })
 
 app.listen(port, () => {

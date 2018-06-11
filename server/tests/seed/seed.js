@@ -13,7 +13,7 @@ const users = [
     password: 'userOnePass',
     tokens: [{
       access: 'auth',
-      token: jwt.sign({ userOneId, access: 'auth' }, 'abc123').toString()
+      token: jwt.sign({ _id: userOneId, access: 'auth' }, 'abc123').toString()
     }]
   },
   {
@@ -36,9 +36,9 @@ const todos = [
 
 const populateTodos = async () => {
   await Todo.remove({})
-  await Todo.insertMany(todos)
+  return Todo.insertMany(todos)
 }
- 
+
 const populateUsers = async () => {
   await User.remove({})
   const userOne = new User(users[0]).save()

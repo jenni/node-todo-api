@@ -104,17 +104,18 @@ app.patch('/todos/:id', async (req, res) => {
   }
 })
 
-app.post('/users', (req, res) => {
+app.post('/users', async (req, res) => {
   const body = _.pick(req.body, ['email', 'password'])
   const user = new User(body)
 
-  user.save().then(() => {
-    return user.generateAuthToken()
-  }).then((token) => {
+  try {
+    const userEntry = await user.save()
+    const token = await user.generateAuthToken()
+
     res.header('x-auth', token).send(user) // set the header
-  }).catch((e) => {
+  } catch(e) {
     res.status(400).send(e)
-  })
+  }
 })
 
 // this route requires authentication
@@ -122,16 +123,14 @@ app.get('/users/me', authenticate, async (req, res) => {
   res.send(req.user)
 })
 
-// POST /users/login {email, password}
-
 app.post('/users/login', async (req, res) => {
   const body = _.pick(req.body, ['email', 'password'])
 
   try {
-    const user = await User.findByCredentials(body.email, body.password)  // find user in mongo that has same email
+    const user = await User.findByCredentials(body.email, body.password)
     const token = await user.generateAuthToken()
 
-    res.header('x-auth', token).send(user) // set the header
+    res.header('x-auth', token).send(user)
   } catch(e) {
     res.send(400)
   }

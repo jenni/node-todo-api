@@ -81,7 +81,6 @@ UserSchema.statics.findByCredentials = async function(email, password) {
   const User = this
   const user = await User.findOne({ email })
 
-  console.log('user ===', user)
   if (!user) {
     return Promise.reject()
   }

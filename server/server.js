@@ -17,9 +17,10 @@ app.use(bodyParser.json())
 
 app.get('/', async (req, res) => res.send('lalalala'))
 
-app.post('/todos', async (req, res) => {
+app.post('/todos', authenticate, async (req, res) => {
   const todo = new Todo({
-    text: req.body.text
+    text: req.body.text,
+    _creator: req.user._id
   })
 
   try {
@@ -30,9 +31,9 @@ app.post('/todos', async (req, res) => {
   }
 })
 
-app.get('/todos', async (req, res) => {
+app.get('/todos', authenticate, async (req, res) => {
   try {
-    const todos = await Todo.find()
+    const todos = await Todo.find({ _creator: req.user._id })
     res.send({ todos })
   } catch(e) {
     res.status(400).send(e)
@@ -41,11 +42,14 @@ app.get('/todos', async (req, res) => {
 
 // "5ae1f66cad5c2c134b4af8e7"
 
-app.get('/todos/:id', async (req, res) => {
+app.get('/todos/:id', authenticate, async (req, res) => {
   const id = req.params.id
 
   try {
-    const todo = await Todo.findById(id)
+    const todo = await Todo.findOne({
+      _id: id,
+      _creator: req.user._id
+    })
 
     if (!todo) {
       return res.status(404).send() // 404 Not found
@@ -56,11 +60,14 @@ app.get('/todos/:id', async (req, res) => {
   }
 })
 
-app.delete('/todos/:id', async (req, res) => {
+app.delete('/todos/:id', authenticate, async (req, res) => {
   const id = req.params.id
 
   try {
-    const todo = await Todo.findByIdAndRemove(id)
+    const todo = await Todo.findOneAndRemove({
+      _id: id,
+      _creator: req.user._id
+    })
 
     if (!todo) {
       return res.status(400).send('resource not found')
@@ -72,7 +79,7 @@ app.delete('/todos/:id', async (req, res) => {
   }
 })
 
-app.patch('/todos/:id', async (req, res) => {
+app.patch('/todos/:id', authenticate, async (req, res) => {
   const id = req.params.id
   const body = _.pick(req.body, ['text', 'completed'])
 
@@ -88,8 +95,10 @@ app.patch('/todos/:id', async (req, res) => {
       body.completedAt = null
     }
 
-    const todo = await Todo.findByIdAndUpdate(
-                            id,
+    const todo = await Todo.findOneAndUpdate(
+                            { _id: id,
+                              _creator: req.user._id
+                            },
                             { $set: body },
                             { new: true }
                           )

@@ -59,6 +59,18 @@ UserSchema.methods.generateAuthToken = function() {
   })
 }
 
+UserSchema.methods.removeToken = async function(token) {
+  const user = this
+
+  return user.update({
+    $pull: {
+      tokens: {
+        token: token
+      }
+    }
+  })
+}
+
 // .statics : model method
 UserSchema.statics.findByToken = function(token) {
   const User = this
@@ -86,8 +98,8 @@ UserSchema.statics.findByCredentials = async function(email, password) {
   }
 
   return new Promise((resolve, reject) => {
-    bcrypt.compare(password, user.password, (err, res) => {
-      res ? resolve(user) : reject()
+    bcrypt.compare(password, user.password, (err, ok) => {
+      ok ? resolve(user) : reject()
     })
   })
 }

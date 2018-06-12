@@ -132,7 +132,17 @@ app.post('/users/login', async (req, res) => {
 
     res.header('x-auth', token).send(user)
   } catch(e) {
-    res.send(400)
+    res.sendStatus(400)
+  }
+})
+
+app.delete('/users/me/token', authenticate, async (req, res) => {
+  try {
+    await req.user.removeToken(req.token)
+
+    res.sendStatus(200)
+  } catch(e) {
+    res.status(400).send(e) //@todo fix removing non-existing token: Unhandled promise rejection
   }
 })
 
